@@ -31,9 +31,9 @@ pub async fn fetch_electricity_and_gas_consumption(
     group_by_opts: &HashMap<String, &str>,
 ) -> Result<Summary, Box<dyn std::error::Error>> {
     let mpan = env::var("MPAN").expect("MPAN env variable not set");
-    let e_serial_number = env::var("SERIAL_NO").expect("SERIAL_NO env variable not set");
+    let e_serial_number = env::var("E_SERIAL_NO").expect("SERIAL_NO env variable not set");
     let mprn = env::var("MPRN").expect("MPRN env variable not set");
-    let g_serial_number = env::var("GAS_SERIAL_NO").expect("GAS_SERIAL_NO env variable not set");
+    let g_serial_number = env::var("G_SERIAL_NO").expect("GAS_SERIAL_NO env variable not set");
 
     let mut e_usage_kwh_two_days = 0.0;
     let mut e_usage_kwh_week = 0.0;
