@@ -13,7 +13,7 @@ reqwest = "0.12.20"
 opentelemetry           = "0.22"
 opentelemetry_sdk       = { version = "0.22", features = ["rt-tokio", "trace", "metrics"] }
 opentelemetry-otlp      = { version = "0.15", features = ["tls", "grpc-tonic", "metrics", "http-proto", "reqwest-client"] }
-opentelemetry-semantic-conventions = "0.15.0"
+opentelemetry-semantic-conventions = "0.30.0"
 serde_json = "1.0"
 warp = "0.3"
 clap = { version = "4.5.41", features = ["derive"] }
