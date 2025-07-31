@@ -89,7 +89,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match args.command {
         Commands::Run { timeout, interval } => {
-            println!("Starting Octopus Energy Prometheus exporter with timeout: {} seconds", timeout);
+            println!("Starting Octopus Energy Prometheus exporter with timeout: {timeout} seconds");
             
             // Verify API key is set
             if env::var("OCTOPUS_API_KEY").is_err() {
@@ -277,7 +277,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             Err(e) => {
                                 error_counter.inc();
-                                eprintln!("[DEBUG] Error fetching electricity usage for the last 30 days: {:?}", e);
+                                eprintln!("[DEBUG] Error fetching electricity usage for the last 30 days: {e}");
                             }
                         }
                         println!("[DEBUG] Sleeping for {interval} seconds before next metrics push.");
@@ -315,7 +315,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 tokio::select! {
                     _ = warp::serve(routes).run(([127, 0, 0, 1], 9090)) => {},
                     _ = timeout_future => {
-                        println!("Timeout reached after {} seconds, shutting down...", timeout);
+                        println!("Timeout reached after {timeout} seconds, shutting down...");
                     }
                 }
             } else {

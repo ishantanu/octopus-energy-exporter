@@ -58,9 +58,8 @@ pub async fn fetch_electricity_and_gas_consumption(
     // 1. Loop through both key and value
     for value in group_by_opts.values() {
         if *value == "hour" {
-            println!("Inside hour");
             for (key, value) in periods {
-                println!("Key: {}, Value: {}", key, value);
+                println!("Key: {key}, Value: {value}");
                  let e_readings = client.list_electricity_consumption(ListElectrictyConsumptionQuery { 
                     mpan: &mpan, 
                     group_by: Some("hour"), 
