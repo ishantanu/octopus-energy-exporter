@@ -208,7 +208,7 @@ pub async fn fetch_electricity_and_gas_consumption(
                         .map(|reading| reading.consumption)
                         .sum();
                      }
-                     _ => { println!("test");}
+                     _ => { eprintln!("Warning: Unknown period key '{key}' encountered.");}
                  }
 
             }
