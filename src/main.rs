@@ -167,22 +167,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let gas_usage_gauge_two_days = Gauge::new("octopus_gas_usage_two_days_kwh", "Total Octopus Energy gas usage for two days in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_two_days.clone())).unwrap();
 
-            let gas_usage_gauge_current_month = Gauge::new("octopus_gas_usage_current_month_kwh", "Total Octopus Energy electricity usage for current month in kWh").unwrap();
+            let gas_usage_gauge_current_month = Gauge::new("octopus_gas_usage_current_month_kwh", "Total Octopus Energy gas usage for current month in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_current_month.clone())).unwrap();
 
-            let gas_usage_gauge_last_2_months = Gauge::new("octopus_gas_usage_last_2_months_kwh", "Total Octopus Energy electricity usage for the last two months in kWh").unwrap();
+            let gas_usage_gauge_last_2_months = Gauge::new("octopus_gas_usage_last_2_months_kwh", "Total Octopus Energy gas usage for the last two months in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_last_2_months.clone())).unwrap();
 
-            let gas_usage_gauge_last_3_months = Gauge::new("octopus_gas_usage_last_3_months_kwh", "Total Octopus Energy electricity usage for the last three months in kWh").unwrap();
+            let gas_usage_gauge_last_3_months = Gauge::new("octopus_gas_usage_last_3_months_kwh", "Total Octopus Energy gas usage for the last three months in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_last_3_months.clone())).unwrap();
             
-            let gas_usage_gauge_last_6_months = Gauge::new("octopus_gas_usage_last_6_months_kwh", "Total Octopus Energy electricity usage for the last six months in kWh").unwrap();
+            let gas_usage_gauge_last_6_months = Gauge::new("octopus_gas_usage_last_6_months_kwh", "Total Octopus Energy gas usage for the last six months in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_last_6_months.clone())).unwrap();
             
-            let gas_usage_gauge_last_1_year = Gauge::new("octopus_gas_usage_last_1_year_kwh", "Total Octopus Energy electricity usage for the last 1 year in kWh").unwrap();
+            let gas_usage_gauge_last_1_year = Gauge::new("octopus_gas_usage_last_1_year_kwh", "Total Octopus Energy gas usage for the last 1 year in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_last_1_year.clone())).unwrap();
 
-            let gas_usage_gauge_week = Gauge::new("octopus_gas_usage_week_kwh", "Total Octopus Energy electricity usage on weekly basis in kWh").unwrap();
+            let gas_usage_gauge_week = Gauge::new("octopus_gas_usage_week_kwh", "Total Octopus Energy gas usage on weekly basis in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_week.clone())).unwrap();
             
             let error_counter = IntCounter::new("octopus_energy_errors_total", "Total number of errors encountered").unwrap();
