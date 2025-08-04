@@ -8,6 +8,7 @@ use clap::{Parser, Subcommand};
 use std::collections::HashMap;
 
 mod usage;
+mod carbon_intensity;
 use octopust::Client;
 
 #[derive(Parser, Debug)]
@@ -29,7 +30,9 @@ enum Commands {
         #[arg(short, long, default_value = "1800")]
         interval: u64,
 
-
+        /// Region to get carbon intensity data from
+        #[arg(short, long, default_value = "England")]
+        region: String,
     }
 }
 
@@ -88,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     match args.command {
-        Commands::Run { timeout, interval } => {
+        Commands::Run { timeout, interval, region } => {
             println!("Starting Octopus Energy Prometheus exporter with timeout: {timeout} seconds");
             
             // Verify API key is set
@@ -158,6 +161,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let electricity_usage_gauge_week = Gauge::new("octopus_electricity_usage_week_kwh", "Total Octopus Energy electricity usage on weekly basis in kWh").unwrap();
             registry.register(Box::new(electricity_usage_gauge_week.clone())).unwrap();
 
+            // gas usage 
             let gas_usage_gauge_two_weeks = Gauge::new("octopus_gas_usage_2w_kwh", "Total Octopus Energy gas usage for last 2 weeks in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_two_weeks.clone())).unwrap();
 
@@ -184,6 +188,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let gas_usage_gauge_week = Gauge::new("octopus_gas_usage_week_kwh", "Total Octopus Energy gas usage on weekly basis in kWh").unwrap();
             registry.register(Box::new(gas_usage_gauge_week.clone())).unwrap();
+
+            // carbon intensity
+            let carbon_intensity_gauge_week = Gauge::new("octopus_energy_carbon_emissions_week_grams", "Total carbon emissions on weekly basis in grams").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_week.clone())).unwrap();
+
+            let carbon_intensity_gauge_two_weeks = Gauge::new("octopus_energy_carbon_emissions_2w_grams", "Total carbon emissions for last two weeks in grams").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_two_weeks.clone())).unwrap();
+
+            let carbon_intensity_gauge_four_weeks = Gauge::new("octopus_energy_carbon_emissions_4w_grams", "Total carbon emissions for last four weeks in grams").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_four_weeks.clone())).unwrap();
+
+            let carbon_intensity_gauge_two_days = Gauge::new("octopus_energy_carbon_emissions_2d_grams", "Total carbon emissions for last two days in grams").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_two_days.clone())).unwrap();
+
+            let carbon_intensity_gauge_current_month = Gauge::new("octopus_energy_carbon_emissions_current_month_grams", "Total carbon emissions for current month in grams").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_current_month.clone())).unwrap();
+
+            let carbon_intensity_gauge_last_2_months = Gauge::new("octopus_energy_carbon_emissions_last_2_months_grams", "Total Octopus Energy gas usage for the last two months in kWh").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_last_2_months.clone())).unwrap();
+            
+            let carbon_intensity_gauge_last_3_months = Gauge::new("octopus_energy_carbon_emissions_last_3_months_grams", "Total Octopus Energy gas usage for the last three months in kWh").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_last_3_months.clone())).unwrap();
+            
+            let carbon_intensity_gauge_last_6_months = Gauge::new("octopus_energy_carbon_emissions_last_6_months_grams", "Total Octopus Energy gas usage for the last six months in kWh").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_last_6_months.clone())).unwrap();
+            
+            let carbon_intensity_gauge_last_1_year = Gauge::new("octopus_energy_carbon_emissions_last_1_months_grams", "Total Octopus Energy gas usage for the last 1 year in kWh").unwrap();
+            registry.register(Box::new(carbon_intensity_gauge_last_1_year.clone())).unwrap();
             
             let error_counter = IntCounter::new("octopus_energy_errors_total", "Total number of errors encountered").unwrap();
             registry.register(Box::new(error_counter.clone())).unwrap();
@@ -218,6 +250,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let gas_usage_gauge_last_3_months = gas_usage_gauge_last_3_months.clone();
                 let gas_usage_gauge_last_6_months = gas_usage_gauge_last_6_months.clone();
                 let gas_usage_gauge_last_1_year = gas_usage_gauge_last_1_year.clone();
+
+                let carbon_intensity_gauge_week = carbon_intensity_gauge_week.clone();
+                let carbon_intensity_gauge_two_weeks = carbon_intensity_gauge_two_weeks.clone();
+                let carbon_intensity_gauge_four_weeks = carbon_intensity_gauge_four_weeks.clone();
+                let carbon_intensity_gauge_two_days = carbon_intensity_gauge_two_days.clone();
+                let carbon_intensity_gauge_current_month = carbon_intensity_gauge_current_month.clone();
+                let carbon_intensity_gauge_last_2_months = carbon_intensity_gauge_last_2_months.clone();
+                let carbon_intensity_gauge_last_3_months = carbon_intensity_gauge_last_3_months.clone();
+                let carbon_intensity_gauge_last_6_months = carbon_intensity_gauge_last_6_months.clone();
+                let carbon_intensity_gauge_last_1_year = carbon_intensity_gauge_last_1_year.clone();
+
                 let error_counter = error_counter.clone();
 
                 tokio::spawn(async move {
@@ -227,7 +270,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     loop {
                         let now = Utc::now();
                         
-                        match usage::fetch_electricity_and_gas_consumption(&client, &now.format("%Y-%m-%dT%H:%M:%SZ").to_string(), &periods, &group_by_opts).await {
+                        match usage::fetch_electricity_and_gas_consumption(&client, &now.format("%Y-%m-%dT%H:%M:%SZ").to_string(), &periods, &group_by_opts, region.as_str()).await {
                             Ok(summary) => {
                                 electricity_usage_gauge_two_days.set(summary.e_usage_kwh_two_days);
                                 electricity_usage_gauge_week.set(summary.e_usage_kwh_week);
@@ -248,6 +291,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 gas_usage_gauge_last_3_months.set(summary.g_usage_kwh_three_months);
                                 gas_usage_gauge_last_6_months.set(summary.g_usage_kwh_six_months);
                                 gas_usage_gauge_last_1_year.set(summary.g_usage_kwh_year);
+
+                                carbon_intensity_gauge_two_days.set(summary.carbon_intensity_two_days);
+                                carbon_intensity_gauge_current_month.set(summary.carbon_intensity_month);
+                                carbon_intensity_gauge_four_weeks.set(summary.carbon_intensity_four_weeks);
+                                carbon_intensity_gauge_week.set(summary.carbon_intensity_week);
+                                carbon_intensity_gauge_last_2_months.set(summary.carbon_intensity_two_months);
+                                carbon_intensity_gauge_last_3_months.set(summary.carbon_intensity_three_months);
+                                carbon_intensity_gauge_last_6_months.set(summary.carbon_intensity_six_months);
+                                carbon_intensity_gauge_two_weeks.set(summary.carbon_intensity_two_weeks);
+                                carbon_intensity_gauge_last_1_year.set(summary.carbon_intensity_year);
                                 
                                 println!(
                                     "[DEBUG] Electricity Usage Summary: usage_kwh = 2d : {:.3}, current week: {:.3}, 2 weeks: {:.3}, 4 weeks: {:.3}, current month: {:.3}, 2 months: {:.3}, 3 months: {:.3}, 6 months: {:.3}, 1 year: {:.3}",
