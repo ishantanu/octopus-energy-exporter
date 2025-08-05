@@ -327,15 +327,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     summary.g_usage_kwh_six_months,
                                     summary.g_usage_kwh_year,
                                 );
+
+                                println!(
+                                    "[DEBUG] Carbon Usage Summary: usage_grams = 2d : {:.3}, current week: {:.3}, 2 weeks: {:.3}, 4 weeks: {:.3}, current month: {:.3}, 2 months: {:.3}, 3 months: {:.3}, 6 months: {:.3}, 1 year: {:.3}",
+                                    summary.carbon_intensity_two_days,
+                                    summary.carbon_intensity_week,
+                                    summary.carbon_intensity_two_weeks,
+                                    summary.carbon_intensity_four_weeks,
+                                    summary.carbon_intensity_month,
+                                    summary.carbon_intensity_two_months,
+                                    summary.carbon_intensity_three_months,
+                                    summary.carbon_intensity_six_months,
+                                    summary.carbon_intensity_year,
+                                );
                             }
                             Err(e) => {
                                 error_counter.inc();
-                                eprintln!("[DEBUG] Error fetching electricity usage for the last 30 days: {e}");
+                                eprintln!("[DEBUG] Error fetching  usage: {e}");
                             }
                         }
                         println!("[DEBUG] Sleeping for {interval} seconds before next metrics push.");
                         time::sleep(Duration::from_secs(interval)).await;
-                        //time::sleep(Duration::from_secs(10)).await;
                     }
                 });
             }

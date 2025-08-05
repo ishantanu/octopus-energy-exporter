@@ -19,14 +19,12 @@ pub async fn get_carbon_intensity(
         .unwrap()
         .with_timezone(&Utc);
 
-    // Convert back to ISO 8601 string
-    let iso_string = date.format("%Y-%m-%dT%H:%MZ").to_string();
-    let iso_string1 = date1.format("%Y-%m-%dT%H:%MZ").to_string();
-    println!("Inside getci: {iso_string}, {:?}", iso_string1);
+    let format_period_from = date.format("%Y-%m-%dT%H:%MZ").to_string();
+    let format_period_to = date1.format("%Y-%m-%dT%H:%MZ").to_string();
     let result = get_intensities(
         &carbonintensity::Target::Region(region),
-        &iso_string,
-        &Some(&iso_string1),
+        &format_period_from,
+        &Some(&format_period_to),
     ).await?;
 
     let avg_intensity: f64 = result
@@ -35,8 +33,6 @@ pub async fn get_carbon_intensity(
     .sum::<f64>() / result.len() as f64;
 
     let carbon_grams = usage_kwh * avg_intensity;
-    println!("{avg_intensity}, {carbon_grams}");
 
-
-    Ok(carbon_grams.into())
+    Ok(carbon_grams)
 }
