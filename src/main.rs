@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match args.command {
         Commands::Run { timeout, interval, region } => {
-            info!("Starting Octopus Energy Prometheus exporter with timeout: {} seconds", timeout);
+            info!("Starting Octopus Energy Prometheus exporter with timeout: {timeout} seconds");
             
             // Verify API key is set
             if env::var("OCTOPUS_API_KEY").is_err() {
