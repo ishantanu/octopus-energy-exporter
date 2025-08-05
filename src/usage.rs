@@ -2,6 +2,7 @@ use std::{collections::HashMap, env};
 use chrono::{DateTime, Utc};
 use octopust::{models::{ListElectrictyConsumptionQuery, ListGasConsumptionQuery}, Client};
 use carbonintensity::Region;
+use log::warn;
 
 use crate::carbon_intensity;
 
@@ -97,13 +98,12 @@ pub async fn fetch_electricity_and_gas_consumption(
       "England" => carbon_region = Region::England,
       "Wales" => carbon_region = Region::Wales,
       "Scotland" => carbon_region = Region::Scotland,
-      _ => { eprintln!("Warning: Unknown region '{region}' encountered.");}
+      _ => { warn!("Warning: Unknown region '{region}' encountered.");}
     }
     // 1. Loop through both key and value
     for value in group_by_opts.values() {
         if *value == "hour" {
             for (key, value) in periods {
-                println!("Key: {key}, Value: {value}");
                  let e_readings = client.list_electricity_consumption(ListElectrictyConsumptionQuery { 
                     mpan: &mpan, 
                     group_by: Some("hour"), 
@@ -133,12 +133,9 @@ pub async fn fetch_electricity_and_gas_consumption(
                         .map(|reading| reading.consumption)
                         .sum();
 
-                        println!("region {carbon_region}");
-
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_two_days, carbon_region, period_from, Some(period_to));
                         carbon_intensity_two_days = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_two_days}");
                         
                         g_usage_kwh_two_days = g_readings
                         .unwrap().results
@@ -159,7 +156,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_week, carbon_region, period_from, Some(period_to));
                         carbon_intensity_week = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_week}");
 
                         g_usage_kwh_week = g_readings
                         .unwrap().results
@@ -178,7 +174,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_two_weeks, carbon_region, period_from, Some(period_to));
                         carbon_intensity_two_weeks = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_two_weeks}");
 
                         g_usage_kwh_two_weeks = g_readings
                         .unwrap().results
@@ -197,7 +192,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_four_weeks, carbon_region, period_from, Some(period_to));
                         carbon_intensity_four_weeks = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_four_weeks}");
 
                         g_usage_kwh_four_weeks = g_readings
                         .unwrap().results
@@ -216,7 +210,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_month, carbon_region, period_from, Some(period_to));
                         carbon_intensity_month = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_month}");
 
                         g_usage_kwh_month = g_readings
                         .unwrap().results
@@ -235,7 +228,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_two_months, carbon_region, period_from, Some(period_to));
                         carbon_intensity_two_months = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_two_months}");
 
                         g_usage_kwh_two_months = g_readings
                         .unwrap().results
@@ -255,7 +247,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_three_months, carbon_region, period_from, Some(period_to));
                         carbon_intensity_three_months = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_three_months}");
 
                         g_usage_kwh_three_months = g_readings
                         .unwrap().results
@@ -274,7 +265,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_six_months, carbon_region, period_from, Some(period_to));
                         carbon_intensity_six_months = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_six_months}");
 
                         g_usage_kwh_six_months = g_readings
                         .unwrap().results
@@ -293,7 +283,6 @@ pub async fn fetch_electricity_and_gas_consumption(
                         let period_from = &value.format("%Y-%m-%dT%H:%M:%SZ").to_string();
                         let ci = carbon_intensity::get_carbon_intensity(e_usage_kwh_year, carbon_region, period_from, Some(period_to));
                         carbon_intensity_year = ci.await.unwrap();
-                        println!("carbon intensity {carbon_intensity_year}");
 
                         g_usage_kwh_year = g_readings
                         .unwrap().results
@@ -301,7 +290,7 @@ pub async fn fetch_electricity_and_gas_consumption(
                         .map(|reading| reading.consumption)
                         .sum();
                      }
-                     _ => { eprintln!("Warning: Unknown period key '{key}' encountered.");}
+                     _ => { warn!("Warning: Unknown period key '{key}' encountered.");}
                  }
 
             }

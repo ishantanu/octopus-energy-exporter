@@ -81,12 +81,12 @@ The following metrics are currently exposed on `http://localhost:9090/metrics`
 * `octopus_gas_usage_2w_kwh` - Total Octopus Energy gas usage for last 2 weeks in kWh
 * `octopus_gas_usage_4w_kwh` - Total Octopus Energy gas usage for last 4 weeks in kWh
 * `octopus_gas_usage_two_days_kwh` - Total Octopus Energy gas usage for two days in kWh
-* `octopus_gas_usage_current_month_kwh` - Total Octopus Energy electricity usage for current month in kWh
-* `octopus_gas_usage_last_2_months_kwh` - Total Octopus Energy electricity usage for the last two months in kWh
-* `octopus_gas_usage_last_3_months_kwh` - Total Octopus Energy electricity usage for the last three months in kWh
-* `octopus_gas_usage_last_6_months_kwh` - Total Octopus Energy electricity usage for the last six months in kWh
-* `octopus_gas_usage_last_1_year_kwh` - Total Octopus Energy electricity usage for the last 1 year in kWh
-* `octopus_gas_usage_week_kwh` - Total Octopus Energy electricity usage on weekly basis in kWh
+* `octopus_gas_usage_current_month_kwh` - Total Octopus Energy gas usage for current month in kWh
+* `octopus_gas_usage_last_2_months_kwh` - Total Octopus Energy gas usage for the last two months in kWh
+* `octopus_gas_usage_last_3_months_kwh` - Total Octopus Energy gas usage for the last three months in kWh
+* `octopus_gas_usage_last_6_months_kwh` - Total Octopus Energy gas usage for the last six months in kWh
+* `octopus_gas_usage_last_1_year_kwh` - Total Octopus Energy gas usage for the last 1 year in kWh
+* `octopus_gas_usage_week_kwh` - Total Octopus Energy gas usage on weekly basis in kWh
 * `octopus_energy_errors_total` - Total number of errors encountered in fetching the data
 * `octopus_energy_carbon_emissions_week_grams` - Total carbon emissions on weekly basis in grams
 * `octopus_energy_carbon_emissions_last_6_months_grams` - Total carbon emissions in last 6 months in grams
@@ -96,7 +96,6 @@ The following metrics are currently exposed on `http://localhost:9090/metrics`
 * `octopus_energy_carbon_emissions_current_month_grams` - Total carbon emissions in current month in grams
 * `octopus_energy_carbon_emissions_4w_grams` - Total carbon emissions in last 4 weeks in grams
 * `octopus_energy_carbon_emissions_2w_grams` - Total carbon emissions in last 2 weeks in grams
-* `octopus_energy_carbon_emissions_2d_grams` - Total carbon emissions in last 2 days in grams
 * `octopus_energy_carbon_emissions_2d_grams` - Total carbon emissions in last 2 days in grams
 
 ## 🛠️ Built With

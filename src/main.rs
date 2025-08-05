@@ -6,6 +6,7 @@ use warp::Filter;
 use chrono::{DateTime, Datelike, Duration as ChronoDuration, Timelike, Utc};
 use clap::{Parser, Subcommand};
 use std::collections::HashMap;
+use log::{info, error};
 
 mod usage;
 mod carbon_intensity;
@@ -88,15 +89,17 @@ fn get_month_range(months_back: i32) -> (DateTime<Utc>, DateTime<Utc>) {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
     let args = Cli::parse();
 
     match args.command {
         Commands::Run { timeout, interval, region } => {
-            println!("Starting Octopus Energy Prometheus exporter with timeout: {timeout} seconds");
+            info!("Starting Octopus Energy Prometheus exporter with timeout: {} seconds", timeout);
             
             // Verify API key is set
             if env::var("OCTOPUS_API_KEY").is_err() {
-                eprintln!("Error: OCTOPUS_API_KEY environment variable must be set");
+                error!("OCTOPUS_API_KEY environment variable must be set");
                 std::process::exit(1);
             }
 
@@ -205,16 +208,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let carbon_intensity_gauge_current_month = Gauge::new("octopus_energy_carbon_emissions_current_month_grams", "Total carbon emissions for current month in grams").unwrap();
             registry.register(Box::new(carbon_intensity_gauge_current_month.clone())).unwrap();
 
-            let carbon_intensity_gauge_last_2_months = Gauge::new("octopus_energy_carbon_emissions_last_2_months_grams", "Total Octopus Energy gas usage for the last two months in kWh").unwrap();
+            let carbon_intensity_gauge_last_2_months = Gauge::new("octopus_energy_carbon_emissions_last_2_months_grams", "Total carbon emissions for the last two months in kWh").unwrap();
             registry.register(Box::new(carbon_intensity_gauge_last_2_months.clone())).unwrap();
             
-            let carbon_intensity_gauge_last_3_months = Gauge::new("octopus_energy_carbon_emissions_last_3_months_grams", "Total Octopus Energy gas usage for the last three months in kWh").unwrap();
+            let carbon_intensity_gauge_last_3_months = Gauge::new("octopus_energy_carbon_emissions_last_3_months_grams", "Total carbon emissions for the last three months in kWh").unwrap();
             registry.register(Box::new(carbon_intensity_gauge_last_3_months.clone())).unwrap();
             
-            let carbon_intensity_gauge_last_6_months = Gauge::new("octopus_energy_carbon_emissions_last_6_months_grams", "Total Octopus Energy gas usage for the last six months in kWh").unwrap();
+            let carbon_intensity_gauge_last_6_months = Gauge::new("octopus_energy_carbon_emissions_last_6_months_grams", "Total carbon emissions for the last six months in kWh").unwrap();
             registry.register(Box::new(carbon_intensity_gauge_last_6_months.clone())).unwrap();
             
-            let carbon_intensity_gauge_last_1_year = Gauge::new("octopus_energy_carbon_emissions_last_1_months_grams", "Total Octopus Energy gas usage for the last 1 year in kWh").unwrap();
+            let carbon_intensity_gauge_last_1_year = Gauge::new("octopus_energy_carbon_emissions_last_1_months_grams", "Total carbon emissions for the last 1 year in kWh").unwrap();
             registry.register(Box::new(carbon_intensity_gauge_last_1_year.clone())).unwrap();
             
             let error_counter = IntCounter::new("octopus_energy_errors_total", "Total number of errors encountered").unwrap();
@@ -302,7 +305,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 carbon_intensity_gauge_two_weeks.set(summary.carbon_intensity_two_weeks);
                                 carbon_intensity_gauge_last_1_year.set(summary.carbon_intensity_year);
                                 
-                                println!(
+                                info!(
                                     "[DEBUG] Electricity Usage Summary: usage_kwh = 2d : {:.3}, current week: {:.3}, 2 weeks: {:.3}, 4 weeks: {:.3}, current month: {:.3}, 2 months: {:.3}, 3 months: {:.3}, 6 months: {:.3}, 1 year: {:.3}",
                                     summary.e_usage_kwh_two_days,
                                     summary.e_usage_kwh_week,
@@ -315,7 +318,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     summary.e_usage_kwh_year,
                                 );
 
-                                println!(
+                                info!(
                                     "[DEBUG] Gas Usage Summary: usage_kwh = 2d : {:.3}, current week: {:.3}, 2 weeks: {:.3}, 4 weeks: {:.3}, current month: {:.3}, 2 months: {:.3}, 3 months: {:.3}, 6 months: {:.3}, 1 year: {:.3}",
                                     summary.g_usage_kwh_two_days,
                                     summary.g_usage_kwh_week,
@@ -328,7 +331,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     summary.g_usage_kwh_year,
                                 );
 
-                                println!(
+                                info!(
                                     "[DEBUG] Carbon Usage Summary: usage_grams = 2d : {:.3}, current week: {:.3}, 2 weeks: {:.3}, 4 weeks: {:.3}, current month: {:.3}, 2 months: {:.3}, 3 months: {:.3}, 6 months: {:.3}, 1 year: {:.3}",
                                     summary.carbon_intensity_two_days,
                                     summary.carbon_intensity_week,
@@ -343,10 +346,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             Err(e) => {
                                 error_counter.inc();
-                                eprintln!("[DEBUG] Error fetching  usage: {e}");
+                                error!("[DEBUG] Error fetching  usage: {e}");
                             }
                         }
-                        println!("[DEBUG] Sleeping for {interval} seconds before next metrics push.");
+                        info!("[DEBUG] Sleeping for {interval} seconds before next metrics push.");
                         time::sleep(Duration::from_secs(interval)).await;
                     }
                 });
@@ -371,16 +374,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let health_route = warp::path!("health").map(|| "OK");
             let routes = metrics_route.or(health_route);
 
-            println!("Starting server on http://localhost:9090");
-            println!("Metrics endpoint: http://localhost:9090/metrics");
-            println!("Health endpoint: http://localhost:9090/health");
+            info!("Starting server on http://localhost:9090");
+            info!("Metrics endpoint: http://localhost:9090/metrics");
+            info!("Health endpoint: http://localhost:9090/health");
 
             // Run the server with optional timeout
             if let Some(timeout_future) = timeout_future {
                 tokio::select! {
                     _ = warp::serve(routes).run(([127, 0, 0, 1], 9090)) => {},
                     _ = timeout_future => {
-                        println!("Timeout reached after {timeout} seconds, shutting down...");
+                        info!("Timeout reached after {timeout} seconds, shutting down...");
                     }
                 }
             } else {
