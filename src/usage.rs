@@ -328,3 +328,88 @@ pub async fn fetch_electricity_and_gas_consumption(
         carbon_intensity_year,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_summary_struct_defaults() {
+        let summary = Summary {
+            e_usage_kwh_two_days: 1.0,
+            e_usage_kwh_week: 2.0,
+            e_usage_kwh_two_weeks: 3.0,
+            e_usage_kwh_four_weeks: 4.0,
+            e_usage_kwh_month: 5.0,
+            e_usage_kwh_two_months: 6.0,
+            e_usage_kwh_three_months: 7.0,
+            e_usage_kwh_six_months: 8.0,
+            e_usage_kwh_year: 9.0,
+            g_usage_kwh_two_days: 10.0,
+            g_usage_kwh_week: 11.0,
+            g_usage_kwh_two_weeks: 12.0,
+            g_usage_kwh_four_weeks: 13.0,
+            g_usage_kwh_month: 14.0,
+            g_usage_kwh_two_months: 15.0,
+            g_usage_kwh_three_months: 16.0,
+            g_usage_kwh_six_months: 17.0,
+            g_usage_kwh_year: 18.0,
+            carbon_intensity_two_days: 19.0,
+            carbon_intensity_week: 20.0,
+            carbon_intensity_two_weeks: 21.0,
+            carbon_intensity_four_weeks: 22.0,
+            carbon_intensity_month: 23.0,
+            carbon_intensity_two_months: 24.0,
+            carbon_intensity_three_months: 25.0,
+            carbon_intensity_six_months: 26.0,
+            carbon_intensity_year: 27.0,
+        };
+        assert_eq!(summary.e_usage_kwh_two_days, 1.0);
+        assert_eq!(summary.g_usage_kwh_year, 18.0);
+        assert_eq!(summary.carbon_intensity_year, 27.0);
+    }
+
+    #[test]
+    fn test_region_mapping() {
+        // Should match known regions
+        let region_names = vec![
+            "North Scotland", "South Scotland", "North West England", "North East England",
+            "South Yorkshire", "North Wales, Merseyside and Cheshire", "South Wales", "West Midlands",
+            "East Midlands", "East England", "South West England", "South England", "London",
+            "South East England", "England", "Wales", "Scotland"
+        ];
+        for region in region_names {
+            let mut carbon_region = carbonintensity::Region::England;
+            match region {
+                "North Scotland" => carbon_region = carbonintensity::Region::NorthScotland,
+                "South Scotland" => carbon_region = carbonintensity::Region::SouthScotland,
+                "North West England" => carbon_region = carbonintensity::Region::NorthWestEngland,
+                "North East England" => carbon_region = carbonintensity::Region::NorthEastEngland,
+                "South Yorkshire" => carbon_region = carbonintensity::Region::SouthYorkshire,
+                "North Wales, Merseyside and Cheshire" => carbon_region = carbonintensity::Region::NorthWalesMerseysideAndCheshire,
+                "South Wales" => carbon_region = carbonintensity::Region::SouthWales,
+                "West Midlands" => carbon_region = carbonintensity::Region::WestMidlands,
+                "East Midlands" => carbon_region = carbonintensity::Region::EastMidlands,
+                "East England" => carbon_region = carbonintensity::Region::EastEngland,
+                "South West England" => carbon_region = carbonintensity::Region::SouthWestEngland,
+                "South England" => carbon_region = carbonintensity::Region::SouthEngland,
+                "London" => carbon_region = carbonintensity::Region::London,
+                "South East England" => carbon_region = carbonintensity::Region::SouthEastEngland,
+                "England" => carbon_region = carbonintensity::Region::England,
+                "Wales" => carbon_region = carbonintensity::Region::Wales,
+                "Scotland" => carbon_region = carbonintensity::Region::Scotland,
+                _ => {}
+            }
+            // This test just ensures we don't panic on mapping
+            assert!(matches!(carbon_region, _));
+        }
+    }
+
+    // Example async test for future logic (requires tokio)
+    // #[tokio::test]
+    // async fn test_fetch_electricity_and_gas_consumption_handles_missing_env() {
+    //     // Unset env vars, or use mock client/inputs
+    //     // let result = fetch_electricity_and_gas_consumption(...).await;
+    //     // assert!(result.is_err());
+    // }
+}

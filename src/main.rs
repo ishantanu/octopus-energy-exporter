@@ -396,3 +396,106 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{Datelike, Timelike, Utc};
+    use clap::CommandFactory;
+
+    #[test]
+    fn test_cli_parsing_run_command() {
+        // This test checks if the CLI can parse the "run" command with required arguments
+        let cli = Cli::try_parse_from([
+            "testbin",
+            "run",
+            "--timeout", "30",
+            "--interval", "5",
+            "--region", "England",
+        ]);
+        assert!(cli.is_ok());
+        let cli = cli.unwrap();
+        match cli.command {
+            Commands::Run { timeout, interval, region } => {
+                assert_eq!(timeout, 30);
+                assert_eq!(interval, 5);
+                assert_eq!(region, "England");
+            }
+        }
+    }
+
+    #[test]
+    fn test_cli_command_help() {
+        // Ensure the clap CLI provides help without panic
+        Cli::command().debug_assert();
+    }
+
+    #[test]
+    fn test_env_key_required() {
+        unsafe { std::env::remove_var("OCTOPUS_API_KEY") }; // This is safe!
+        let key = std::env::var("OCTOPUS_API_KEY");
+        assert!(key.is_err());
+    }
+
+    #[test]
+    fn test_get_year_range() {
+        // Freeze "now"
+        let now = Utc::now();
+        let years_back = 2;
+        let (start, end) = get_year_range(years_back);
+
+        // Start should be same month, day=1, hour/min/sec=0, nanosec=0, year shifted back
+        assert_eq!(start.year(), now.year() - years_back);
+        assert_eq!(start.month(), now.month());
+        assert_eq!(start.day(), 1);
+        assert_eq!(start.hour(), 0);
+        assert_eq!(start.minute(), 0);
+        assert_eq!(start.second(), 0);
+        assert_eq!(start.nanosecond(), 0);
+
+        // End should be "now" or very close to it
+        assert!((end.timestamp() - now.timestamp()).abs() < 3); // allow up to 3s difference
+    }
+
+    #[test]
+    fn test_get_month_range_current() {
+        let now = Utc::now();
+        let (start, end) = get_month_range(0);
+
+        // Start should be first day of current month at midnight
+        assert_eq!(start.year(), now.year());
+        assert_eq!(start.month(), now.month());
+        assert_eq!(start.day(), 1);
+        assert_eq!(start.hour(), 0);
+        assert_eq!(start.minute(), 0);
+        assert_eq!(start.second(), 0);
+        assert_eq!(start.nanosecond(), 0);
+
+        // End should be "now" or very close
+        assert!((end.timestamp() - now.timestamp()).abs() < 3);
+    }
+
+    #[test]
+    fn test_get_month_range_previous_month() {
+        let now = Utc::now();
+        let (start, end) = get_month_range(1);
+
+        // Calculate expected year and month
+        let mut expected_year = now.year();
+        let mut expected_month = now.month() as i32 - 1;
+        if expected_month == 0 {
+            expected_month = 12;
+            expected_year -= 1;
+        }
+        assert_eq!(start.year(), expected_year);
+        assert_eq!(start.month(), expected_month as u32);
+        assert_eq!(start.day(), 1);
+        assert_eq!(start.hour(), 0);
+        assert_eq!(start.minute(), 0);
+        assert_eq!(start.second(), 0);
+        assert_eq!(start.nanosecond(), 0);
+
+        // End should be "now" or very close
+        assert!((end.timestamp() - now.timestamp()).abs() < 3);
+    }
+}
