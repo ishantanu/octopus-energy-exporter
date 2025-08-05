@@ -1,5 +1,7 @@
 # 🐙 Octopus Energy Prometheus Exporter
 
+[![codecov](https://codecov.io/github/ishantanu/octopus-energy-exporter/graph/badge.svg?token=6CTT8XY0YT)](https://codecov.io/github/ishantanu/octopus-energy-exporter)
+
 [![rust-clippy analyze](https://github.com/ishantanu/octopus-energy-exporter/actions/workflows/rust_clippy.yml/badge.svg)](https://github.com/ishantanu/octopus-energy-exporter/actions/workflows/rust_clippy.yml)
 
 A lightweight prometheus exporter written in Rust that collects metrics from Octopus Energy using the [octopust](https://github.com/ishantanu/octopust) crate and exposes them for Prometheus scraping.

@@ -20,7 +20,7 @@ jobs:
         run: cargo install cargo-llvm-cov --locked
 
       - name: Run coverage
-        run: cargo llvm-cov --lcov --output-path lcov.info
+        run: cargo llvm-cov --all-features --doctests --workspace --lcov --output-path lcov.info
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -31,5 +31,5 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-            files: lcov.info
-            token: ${{ secrets.CODECOV_TOKEN }}
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
