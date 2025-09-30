@@ -10,7 +10,7 @@ prometheus = "0.14"
 octopust = "0.4.0"
 serde = { version = "1.0", features = ["derive"] }
 reqwest = "0.12.20"
-opentelemetry           = "0.30"
+opentelemetry           = "0.31"
 opentelemetry_sdk       = { version = "0.30", features = ["rt-tokio", "trace", "metrics"] }
 opentelemetry-otlp      = { version = "0.30", features = ["tls", "grpc-tonic", "metrics", "http-proto", "reqwest-client"] }
 opentelemetry-semantic-conventions = "0.30.0"
